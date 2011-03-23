@@ -1,0 +1,69 @@
+
+##Static defines
+SWAP MSTRS MASTER_NUM
+SWAP SLVS EXPR(SLAVE_NUM+DVAL(DECERR_SLV))
+
+LOOP MX MSTRS
+LOOP SX SLVS
+
+SWAP MSTR_BITS LOG2(MSTRS) 
+SWAP SLV_BITS  LOG2(SLVS) 
+
+SWAP SERR SLAVE_NUM
+
+GROUP IC_AXI_A is {
+    ID       ID_BITS                input
+    ADDR     ADDR_BITS              input
+    LEN      4                      input
+    SIZE     2                      input
+    BURST    2                      input
+    CACHE    4                      input
+    PROT     3                      input
+    LOCK     2                      input
+    USER     USER_BITS              input
+    VALID    1                      input
+    READY    1                      output
+}
+
+GROUP IC_AXI_W is {
+    ID        ID_BITS                input
+    DATA      DATA_BITS              input
+    STRB      DATA_BITS/8            input
+    LAST      1                      input
+    USER      USER_BITS              input
+    VALID     1                      input
+    READY     1                      output
+}
+
+GROUP IC_AXI_B is {
+    ID        ID_BITS                output
+    RESP      2                      output
+    USER      USER_BITS              output
+    VALID     1                      output
+    READY     1                      input
+}
+
+GROUP IC_AXI_R is {
+    ID        ID_BITS                output
+    DATA      DATA_BITS              output
+    RESP      2                      output
+    LAST      1                      output
+    USER      USER_BITS              output
+    VALID     1                      output
+    READY     1                      input
+}
+
+GROUP IC_AXI joins {
+    GROUP IC_AXI_A prefix_AW
+    GROUP IC_AXI_W prefix_W
+    GROUP IC_AXI_B prefix_B
+    GROUP IC_AXI_A prefix_AR
+    GROUP IC_AXI_R prefix_R
+}
+
+GROUP IC_AXI_CMD is {
+    SLV       SLV_BITS               input
+    ID        ID_BITS                input
+    VALID     1                      input
+    READY     1                      input
+}

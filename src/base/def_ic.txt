@@ -1,0 +1,50 @@
+INCLUDE def_ic_static.txt
+
+SWAP #FFD      #1                               ##flip-flop delay
+
+SWAP PREFIX     fabric_MASTER_NUM_SLAVE_NUM     ##prefix for all module and file names
+
+##fabric 0
+BUILD
+SWAP MASTER_NUM 3                               ##number of masters
+SWAP SLAVE_NUM  8                               ##number of slaves
+
+##DEFINE DEF_DECERR_SLV                         ##use interanl decode slave error
+
+SWAP ID_BITS    2                               ##AXI ID bits
+LOOP M0_IDX     1                               ##number of IDs for master 0
+SWAP ID_M0_ID0  ID_BITS'b00                     ##master 0 ID0
+LOOP M1_IDX     1                               ##number of IDs for master 1
+SWAP ID_M1_ID0  ID_BITS'b01                     ##master 1 ID0
+LOOP M2_IDX     1                               ##number of IDs for master 2
+SWAP ID_M2_ID0  ID_BITS'b10                     ##master 2 ID0
+ 
+SWAP CMD_DEPTH  8                               ##AXI command depth for read and write
+
+SWAP DATA_BITS 64                               ##AXI data bits
+SWAP ADDR_BITS 32                               ##AXI address bits
+
+SWAP USER_BITS  4                               ##AXI user bits
+ENDBUILD
+
+##fabric 1
+BUILD
+SWAP MASTER_NUM 1                               ##number of masters
+SWAP SLAVE_NUM  3                               ##number of slaves
+
+DEFINE DEF_DECERR_SLV                           ##use interanl decode slave error
+
+SWAP ID_BITS    2                               ##AXI ID bits
+LOOP M0_IDX     3                               ##number of IDs for master 0
+SWAP ID_M0_ID0  ID_BITS'b00                     ##master 0 ID0
+SWAP ID_M0_ID1  ID_BITS'b01                     ##master 0 ID1
+SWAP ID_M0_ID2  ID_BITS'b11                     ##master 0 ID2
+ 
+SWAP CMD_DEPTH  4                               ##AXI command depth for read and write
+
+SWAP DATA_BITS 32                               ##AXI data bits
+SWAP ADDR_BITS 24                               ##AXI address bits
+
+SWAP USER_BITS  0                               ##AXI user bits
+ENDBUILD
+
