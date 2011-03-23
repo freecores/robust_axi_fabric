@@ -10,9 +10,7 @@ In order to create the Verilog design use the run.sh script in the run directory
 
 The RobustVerilog top source file is ic.v, it calls the top definition file named def_ic.txt.
 
-The default definition file def_ic.txt generates 2 fabrics, the first with 3 masters and 8 slaves,
-
-the second with 1 master, 3 slaves and an internal decode error slave.
+The default definition file def_ic.txt generates a fabric with 3 masters and 6 slaves.
 
 Changing the interconnect parameters should be made only in def_ic.txt in the src/base directory (changing master num, slave num etc.).
 
