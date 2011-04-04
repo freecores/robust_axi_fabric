@@ -53,8 +53,8 @@ module PREFIX_ic_dec (PORTS);
      always @(MMX_AADDR or MMX_AIDOK)                       
        begin                                                  
 	  case ({MMX_AIDOK, MMX_AADDR[DEC_MSB:DEC_LSB]})    
-	    {1'b1, BIN(MX MSTR_BITS)} : MMX_ASLV = 'dSX;  
-            default : MMX_ASLV = SERR;                     
+	    {1'b1, BIN(SX MSTR_BITS)} : MMX_ASLV = 'dSX;  
+            default : MMX_ASLV = 'dSERR;                     
 	  endcase                                             
        end                                                    
 

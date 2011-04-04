@@ -67,7 +67,7 @@ module PREFIX_ic_addr (PORTS);
    wire 				      SSX_AIDOK;
    
    CREATE ic_dec.v def_ic.txt
-   PREFIX_ic_dec #(ADDR_BITS)
+   PREFIX_ic_dec
    PREFIX_ic_dec (
 		  .MMX_AADDR(MMX_AADDR),
 		  .MMX_AID(MMX_AID),
