@@ -44,7 +44,7 @@ module PREFIX_ic_dec (PORTS);
    output 				      MMX_AIDOK;
 
    parameter 				      DEC_MSB =  ADDR_BITS - 1;
-   parameter 				      DEC_LSB =  ADDR_BITS - MSTR_BITS;
+   parameter 				      DEC_LSB =  ADDR_BITS - SLV_BITS;
    
    reg [SLV_BITS-1:0] 			      MMX_ASLV;
    reg 					      MMX_AIDOK;
@@ -53,7 +53,7 @@ module PREFIX_ic_dec (PORTS);
      always @(MMX_AADDR or MMX_AIDOK)                       
        begin                                                  
 	  case ({MMX_AIDOK, MMX_AADDR[DEC_MSB:DEC_LSB]})    
-	    {1'b1, BIN(SX MSTR_BITS)} : MMX_ASLV = 'dSX;  
+	    {1'b1, BIN(SX SLV_BITS)} : MMX_ASLV = 'dSX;  
             default : MMX_ASLV = 'dSERR;                     
 	  endcase                                             
        end                                                    
