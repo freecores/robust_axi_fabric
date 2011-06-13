@@ -1,4 +1,4 @@
-##RobustVerilog project 
+PROJDIR = run 
 
 SRCFILE = ic.v
 DEFFILE =

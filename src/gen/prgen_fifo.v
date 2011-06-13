@@ -1,4 +1,4 @@
-<##//////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
 ////                                                             ////
 ////  Author: Eyal Hochberg                                      ////
 ////          eyal@provartec.com                                 ////
@@ -25,12 +25,16 @@
 //// PURPOSE.  See the GNU Lesser General Public License for more////
 //// details. http://www.gnu.org/licenses/lgpl.html              ////
 ////                                                             ////
-//////////////////////////////////////////////////////////////////##>
+/////////////////////////////////////////////////////////////////////
 
+IFDEF STUB
+OUTFILE prgen_fifo_stub.v
+module prgen_fifo_stub(PORTS);
+ELSE STUB
 OUTFILE prgen_fifo.v
-
 module prgen_fifo(PORTS);
-
+ENDIF STUB
+  
    parameter                  WIDTH      = 8;
    parameter                  DEPTH_FULL = 8;
 
@@ -44,7 +48,8 @@ module prgen_fifo(PORTS);
 			      (DEPTH <= 32)  ? 5 :
 			      (DEPTH <= 64)  ? 6 :
 			      (DEPTH <= 128) ? 7 : 
-			      (DEPTH <= 256) ? 8 : 0; //0 is ilegal
+			      (DEPTH <= 256) ? 8 :
+			      (DEPTH <= 512) ? 9 : 0; //0 is ilegal
 
    parameter 		      LAST_LINE  = DEPTH-1;
    
@@ -57,7 +62,7 @@ module prgen_fifo(PORTS);
    input 		      pop;
    input [WIDTH-1:0] 	      din;
    output [WIDTH-1:0] 	      dout;
-   //output 		      next;
+   IF STUB output [DEPTH_BITS:0] fullness;
    output 		      empty;
    output 		      full;
    
@@ -67,9 +72,9 @@ module prgen_fifo(PORTS);
    wire 		      fifo_push;
    wire 		      fifo_pop;
    
-   reg [DEPTH-1:0] 	      fullness_in;
-   reg [DEPTH-1:0] 	      fullness_out;
-   reg [DEPTH-1:0] 	      fullness;
+   reg [DEPTH-1:0] 	      full_mask_in;
+   reg [DEPTH-1:0] 	      full_mask_out;
+   reg [DEPTH-1:0] 	      full_mask;
    reg [WIDTH-1:0] 	      fifo [DEPTH-1:0];
    wire 		      fifo_empty;
    wire 		      next;
@@ -128,28 +133,64 @@ module prgen_fifo(PORTS);
    
    always @(/*AUTOSENSE*/fifo_push or ptr_in)
      begin
-	fullness_in = {DEPTH{1'b0}};
-	fullness_in[ptr_in] = fifo_push;
+	full_mask_in = {DEPTH{1'b0}};
+	full_mask_in[ptr_in] = fifo_push;
      end
    
    always @(/*AUTOSENSE*/fifo_pop or ptr_out)
      begin
-	fullness_out = {DEPTH{1'b0}};
-	fullness_out[ptr_out] = fifo_pop;
+	full_mask_out = {DEPTH{1'b0}};
+	full_mask_out[ptr_out] = fifo_pop;
      end
    
    always @(posedge clk or posedge reset)
      if (reset)
-       fullness <= #FFD {DEPTH{1'b0}};
+       full_mask <= #FFD {DEPTH{1'b0}};
      else if (fifo_push | fifo_pop)
-       fullness <= #FFD (fullness & (~fullness_out)) | fullness_in;
+       full_mask <= #FFD (full_mask & (~full_mask_out)) | full_mask_in;
 
 
-   assign next       = |fullness;
+   assign next       = |full_mask;
    assign fifo_empty = ~next;
    assign empty      = fifo_empty & dout_empty;
-   assign full       = SINGLE ? !dout_empty : &fullness;
+   assign full       = SINGLE ? !dout_empty : &full_mask;
 
+
+   
+IFDEF STUB
+  reg [DEPTH_BITS:0] fullness;
+   
+   always @(posedge clk or posedge reset)
+     if (reset)
+       fullness <= #FFD {DEPTH_BITS+1{1'b0}};
+     else if (push | pop)
+       fullness <= #FFD fullness + push - pop;
+   
+   wire              overflow  = full & fifo_push & (~fifo_pop);
+   wire              underflow = empty & fifo_pop & (~fifo_push);
+   
+   always @(posedge overflow)
+     begin
+        #1;
+        if (overflow)
+          begin
+             $display("-E-%m - overflow.\tTime: %0d ns", $time);
+             #1000;
+             $finish;
+          end
+     end
+   always @(posedge underflow)
+     begin
+        #1;
+        if (underflow)
+          begin
+             $display("-E-%m - underflow.\tTime: %0d ns", $time);
+             #1000;
+             $finish;
+          end
+     end
+ENDIF STUB
+   
 endmodule
 
 
